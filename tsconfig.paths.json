@@ -9,10 +9,9 @@
             "@img/*": ["assets/img/*"],
             "@routes/*": ["routes/*"],
             "@pages/*": ["pages/*"],
-            "@http/*": ["http/*"],
             "@config/*": ["config/*"],
-            "@API/*": ["API/*"],
-            "@styles/*": ["styles/*"]
+            "@styles/*": ["styles/*"],
+            "@middleware/*": ["middleware/*"]
         }
     }
 }
