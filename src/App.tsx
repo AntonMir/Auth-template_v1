@@ -22,7 +22,7 @@ const queryClient = new QueryClient({
 
 const App: React.FC = () => {
 
-    const { login, logout, refresh, userName, isAuthenticated } = useAuth()
+    const { signup, login, logout, refresh, userName, isAuthenticated } = useAuth()
 
     // если пользовател авторизован отдаем скрытые страницы иначе переход на сраницу входа
     const appRoutes = isAuthenticated ? privateRoutes : publicRoutes
@@ -33,6 +33,7 @@ const App: React.FC = () => {
             <UserContext.Provider
                 value={{
                     userName,
+                    signup,
                     login,
                     logout,
                     refresh,

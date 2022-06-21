@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { IResponseTokens } from '@interfaces/IAuth'
+import { ILoginResponse, IRefreshResponse } from '@interfaces/IAuth'
 import { useNavigate } from 'react-router-dom'
 // import axios from 'axios'
 import axios from '@middleware/Axios'
@@ -9,39 +9,51 @@ export const useAuth = () => {
     const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken') ?? '')
     const [refreshToken, setRefreshToken] = useState(localStorage.getItem('refreshToken') ?? '')
     const [userName, setUserName] = useState( localStorage.getItem('userName') ?? '')
+    const [email, setEmail] = useState(localStorage.getItem('email') ?? '')
     const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('isAuthenticated') ?? '')
     const navigate = useNavigate()
+    
+    // REGISTRATION=================================================
+    const signup = useCallback(async (name: string ,email: string, password: string) => {
+        const response = await axios.post(
+            '/api/auth/signup', 
+            {name, email, password })
+        return response.data
+    }, [navigate])
 
     // LOGIN=================================================
-    const login = useCallback(async (username: string, password: string) => {
-        const response = await axios.post<IResponseTokens>('/auth', { username, password })
+    const login = useCallback(async (email: string, password: string) => {
+        const response = await axios.post<ILoginResponse>(
+            '/api/auth/login', 
+            { email, password })
 
-        const tokens = response.data
+        const { tokens, name } = response.data
 
-        setUserName(username)
+        setUserName(name)
+        setEmail(email)
         setAccessToken(tokens.access_token)
         setRefreshToken(tokens.refresh_token)
         setIsAuthenticated(!!tokens.access_token)
 
-        localStorage.setItem('userName', username)
+        localStorage.setItem('userName', name)
+        localStorage.setItem('email', email)
         localStorage.setItem('accessToken', tokens.access_token)
         localStorage.setItem('refreshToken', tokens.refresh_token)
         localStorage.setItem('isAuthenticated', JSON.stringify(!!tokens.access_token))
 
-        // при успешном логине отправляемся на вкладку, на которой в прошлый раз вышли
-        // navigate(`/${localStorage.getItem('globalPage') || 'clients'}`)
-
-        return tokens
+        return response.data
     }, [navigate])
 
     // LOGUOT=================================================
     const logout = useCallback(() => {
         setUserName('')
+        setEmail('')
         setAccessToken('')
         setRefreshToken('')
         setIsAuthenticated(false)
 
         localStorage.removeItem('userName')
+        localStorage.removeItem('email')
         localStorage.removeItem('accessToken')
         localStorage.removeItem('refreshToken')
         localStorage.removeItem('isAuthenticated')
@@ -49,8 +61,8 @@ export const useAuth = () => {
 
     // REFRESH=================================================
     const refresh = useCallback(async (refreshToken: string, accessToken?: string) => {
-        const response = await axios.post<IResponseTokens>(
-            `${config.authServerURL}/auth/refresh`,
+        const response = await axios.post<IRefreshResponse>(
+            `/api/auth/refresh`,
             { refresh_token: refreshToken },
             {
                 withCredentials: true,
@@ -69,6 +81,7 @@ export const useAuth = () => {
     }, [])
 
     return {
+        signup,
         login,
         logout,
         refresh,

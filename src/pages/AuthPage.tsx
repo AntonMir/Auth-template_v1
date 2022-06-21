@@ -10,7 +10,7 @@ const AuthPage: React.FC = () => {
     return (
         <Layout>
             <Row justify="center" align="middle" className="h100">
-                <Card>
+                <Card style={{ minWidth: '25%'}}>
                     <Routes>
                         <Route path='/login' element={<Login />} key='/login' />
                         <Route path='/registration' element={<Registration />} key='/registration' />

@@ -1,5 +1,5 @@
 import Axios from 'axios'
-import { IResponseTokens } from '@interfaces/IAuth'
+import { IRefreshResponse } from '@interfaces/IAuth'
 import config from '@config/config'
 
 // withCredentials - с использованием учетных данных
@@ -41,8 +41,8 @@ axios.interceptors.response.use(
                 const refreshToken = localStorage.getItem('refreshToken') || ''
                 const accessToken = localStorage.getItem('accessToken') || ''
 
-                const response = await Axios.post<IResponseTokens>(
-                    `${config.authServerURL}/auth/refresh`,
+                const response = await Axios.post<IRefreshResponse>(
+                    `/api/auth/refresh`,
                     { refresh_token: refreshToken },
                     {
                         withCredentials: true,

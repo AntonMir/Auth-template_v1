@@ -3,10 +3,18 @@ import { IUserContext } from '@interfaces/IAuth'
 
 export const UserContext = createContext<IUserContext>({
     userName: '',
+    signup: async () => {
+        return {
+            message: ''
+        }
+    },
     login: async () => {
         return {
-            access_token: '',
-            refresh_token: '',
+            tokens: {
+                access_token: '',
+                refresh_token: ''
+            },
+            name: ''
         }
     },
     logout: () => {},

@@ -1,15 +1,32 @@
 import React, { useState, useContext, ChangeEvent } from 'react'
 // navigation
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Button, Form, Input, message } from 'antd'
 import { useQuery } from 'react-query'
-import { IResponseTokens } from '@interfaces/IAuth'
 import { UserContext } from '@context/UserContext'
 import styled from 'styled-components'
 
 const LoginForm: React.FC = () => {
-    const [form, setForm] = useState({ userName: '', password: '' })
+    const [form, setForm] = useState({ name: '', email: '', password: '' })
     const auth = useContext(UserContext)
+
+
+    const { isLoading, refetch } = useQuery(
+        'auth',
+        async () => {
+            return await auth.signup(form.name ,form.email, form.password)
+        },
+        {
+            enabled: false,
+            retry: 1,
+            onSuccess: (res) => {
+                message.success("Зарегистрирован!")
+            },
+            onError: (err) => {
+                message.error("Ошибка регистрации!")
+            },
+        }
+    )
 
     const changeUserData = (event: ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [event.target.name]: event.target.value })
@@ -19,56 +36,47 @@ const LoginForm: React.FC = () => {
         refetch();
     }
 
-    const { isLoading, isError, error, refetch } = useQuery<IResponseTokens, Error>(
-        'auth',
-        async () => {
-            return await auth.login(form.userName, form.password)
-        },
-        {
-            enabled: false,
-            retry: 1,
-            onSuccess: (res) => {
-                message.success("Авторизован!")
-            },
-            onError: (err) => {
-                message.error("Ошибка авторизации!")
-            },
-        }
-    )
-
+    
     return (
+
         <Form>
             <Title>Регистрация</Title>
-            {isError && <div style={{ color: 'red' }}>{error.message}</div>}
-            <Form.Item
-                label="Имя пользователя"
+
+            <FormInput
+                label="Логин"
                 name="name"
                 rules={[{ required: true, message: 'Пожалуйста введите имя пользователя!' }]}
             >
-                <Input type="text" name="userName" onChange={changeUserData} />
-            </Form.Item>
-            <Form.Item
+                <Input type="text" name="name" onChange={changeUserData} />
+            </FormInput>
+
+            <FormInput
+                label="Email"
+                name="email"
+                rules={[{ required: true, message: 'Пожалуйста введите email!' }]}
+            >
+                <Input type="email" name="email" onChange={changeUserData} />
+            </FormInput>
+
+            <FormInput
                 label="Пароль"
                 name="password"
                 rules={[{ required: true, message: 'Пожалуйста введите пароль' }]}
             >
                 <Input type="password" name="password" onChange={changeUserData} />
-            </Form.Item>
-            <Form.Item>
+            </FormInput>
+
+            <FormBtn>
                 <Button 
                     type="primary" 
-                    htmlType="submit" 
-                    loading={isLoading} 
+                    loading={isLoading}
                     onClick={loginHandler}
                 >
-                    Войти
+                    Регистрация
                 </Button>
-            </Form.Item>
-            <Form.Item>
-                <Link type="link" to="../login">
-                    Есть аккаунт? Авторизуйся!
-                </Link>
-            </Form.Item>
+            </FormBtn>
+
+                <LinkStyled type="link" to="../login">Есть аккаунт? Войди!</LinkStyled>
         </Form>
     )
 }
@@ -76,6 +84,35 @@ const LoginForm: React.FC = () => {
 const Title = styled.h1`
     text-align: center;
     margin-bottom: 30px;
+`
+
+// фиксируем ширину поля ввода
+const FormInput = styled(Form.Item)`
+    display: flex;
+    justify-content: space-between;
+
+    .ant-form-item-control {
+        max-width: 80%;
+    }
+`
+
+// ширина и отцентровка кнопки
+const FormBtn = styled(Form.Item)`
+    display: flex;
+    justify-content: center;
+
+    .ant-form-item-control {
+        max-width: 40%;
+        button {
+            width: 100%;
+        }
+    }
+`
+
+// отцентровка текста ссылки
+const LinkStyled = styled(Link)`
+    display: block;
+    text-align: center;
 `
 
 export default LoginForm
