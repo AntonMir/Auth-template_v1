@@ -1,30 +1,40 @@
 import React, { useState, useContext, ChangeEvent } from 'react'
 // navigation
 import { Link } from 'react-router-dom'
+// ANTD
 import { Button, Form, Input, message } from 'antd'
+// cache requests
 import { useQuery } from 'react-query'
-import { ILoginResponse } from '@interfaces/IAuth'
-import { UserContext } from '@context/UserContext'
+// context
+import { Context } from '@context/Context'
+// auth validation
+import { emailValidate, passValidate } from '@utils/validation'
+// interfaces
+import { IResponseLogin } from '@interfaces/IResponse'
+import { IResponseError } from '@interfaces/IResponseError'
+// styles
 import styled from 'styled-components'
 
 const LoginForm: React.FC = () => {
     const [form, setForm] = useState({ email: '', password: '' })
-    const auth = useContext(UserContext)
+    const auth = useContext(Context)
 
   
-    const { isLoading, refetch } = useQuery<ILoginResponse, Error>(
-        'auth',
+    const { isLoading, refetch } = useQuery<IResponseLogin, IResponseError>(
+        'login',
         async () => {
             return await auth.login(form.email, form.password)
         },
         {
             enabled: false,
-            retry: 1,
+            retry: 0,
             onSuccess: (res) => {
-                message.success("Авторизован!")
+                // поприветствуем пользователя в случае успешного входа
+                message.success(`Добро пожаловать, ${res.name}!`)
             },
             onError: (err) => {
-                message.error("Ошибка авторизации!")
+                // если ошибка выводим ее пользователю
+                message.error(err.response.data.message)
             },
         }
     )
@@ -34,7 +44,10 @@ const LoginForm: React.FC = () => {
     }
 
     const loginHandler = () => {
-        refetch();
+        // функция дял проверки корректности введенных данных
+        if(!emailValidate(form.email)) return message.error('Введен некорректный Email!')
+        if(!passValidate(form.password)) return message.error('Пароль должен иметь длинну от 4 до 10 символов и содержать только ЛАТИНСКИЕ символы!')
+        return refetch()
     }
 
 
@@ -56,7 +69,7 @@ const LoginForm: React.FC = () => {
                 name="password"
                 rules={[{ required: true, message: 'Пожалуйста введите пароль' }]}
             >
-                <Input type="password" name="password" onChange={changeUserData} />
+                <Input.Password type="password" name="password" onChange={changeUserData} />
             </FormInput>
 
             <FormBtn>
@@ -69,7 +82,7 @@ const LoginForm: React.FC = () => {
                 </Button>
             </FormBtn>
 
-                <LinkStyled type="link" to="../registration">Нет аккаунта? Зарегистрируйся!</LinkStyled>
+                <LinkStyled type="link" to="../registration">Нет аккаунта? Зарегистрируйтесь!</LinkStyled>
         </Form>
     )
 }

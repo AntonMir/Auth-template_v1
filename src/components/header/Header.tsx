@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import { UserContext } from '@context/UserContext'
+import { Context } from '@context/Context'
 import '@styles/header.css'
 
 
@@ -9,7 +9,7 @@ import '@styles/header.css'
 const Header: React.FC = () => {
     // const [globalPage, setGlobalPage] = useState(localStorage.getItem('globalPage') ?? 'clients')
 
-    const auth = useContext(UserContext)
+    const auth = useContext(Context)
     // const navigate = useNavigate()
 
     // useEffect(() => {

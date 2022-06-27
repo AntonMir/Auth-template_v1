@@ -3,9 +3,9 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 // React query
 import { QueryClient, QueryClientProvider } from 'react-query'
 // Context
-import { UserContext } from '@context/UserContext'
+import { Context } from '@context/Context'
 // Auth
-import { useAuth } from '@hooks/useAuth'
+import { useContext } from '@hooks/useContext'
 // routes
 import { publicRoutes, privateRoutes} from '@routes/Routes'
 // antd
@@ -22,7 +22,7 @@ const queryClient = new QueryClient({
 
 const App: React.FC = () => {
 
-    const { signup, login, logout, refresh, userName, isAuthenticated } = useAuth()
+    const { signup, login, logout, userEmail, userName, isAuthenticated } = useContext()
 
     // если пользовател авторизован отдаем скрытые страницы иначе переход на сраницу входа
     const appRoutes = isAuthenticated ? privateRoutes : publicRoutes
@@ -30,13 +30,13 @@ const App: React.FC = () => {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <UserContext.Provider
+            <Context.Provider
                 value={{
                     userName,
+                    userEmail,
                     signup,
                     login,
                     logout,
-                    refresh,
                     isAuthenticated,
                 }}
             >
@@ -47,7 +47,7 @@ const App: React.FC = () => {
                         <Route path="*" element={<Navigate replace to={isAuthenticated ? '/temp' : '/auth'} />} />
                     </Routes>
                 </Layout>
-            </UserContext.Provider>
+            </Context.Provider>
         </QueryClientProvider>
     );
 }

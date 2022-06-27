@@ -11,7 +11,8 @@
             "@pages/*": ["pages/*"],
             "@config/*": ["config/*"],
             "@styles/*": ["styles/*"],
-            "@middleware/*": ["middleware/*"]
+            "@middleware/*": ["middleware/*"],
+            "@utils/*": ["utils/*"]
         }
     }
 }

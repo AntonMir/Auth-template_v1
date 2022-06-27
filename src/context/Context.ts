@@ -1,8 +1,9 @@
 import { createContext } from 'react'
-import { IUserContext } from '@interfaces/IAuth'
+import { IContext } from '@interfaces/IContext'
 
-export const UserContext = createContext<IUserContext>({
+export const Context = createContext<IContext>({
     userName: '',
+    userEmail: '',
     signup: async () => {
         return {
             message: ''
@@ -18,11 +19,5 @@ export const UserContext = createContext<IUserContext>({
         }
     },
     logout: () => {},
-    refresh: async () => {
-        return {
-            access_token: '',
-            refresh_token: '',
-        }
-    },
     isAuthenticated: false,
 })
